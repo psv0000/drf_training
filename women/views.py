@@ -2,11 +2,17 @@ from django.db.migrations import serializer
 from django.forms import model_to_dict
 from django.shortcuts import render
 from django.template.base import kwarg_re
+from rest_framework import generics
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
 from .serializers import WomenSerializer
 from .models import Women
+
+
+class WomenAPIList(generics.ListCreateAPIView):
+    queryset = Women.objects.all()
+    serializer_class = WomenSerializer
 
 
 class WomenAPIView(APIView):
