@@ -1,30 +1,26 @@
-from django.db.migrations import serializer
-from django.forms import model_to_dict
-from django.shortcuts import render
-from django.template.base import kwarg_re
-from rest_framework import generics, viewsets
-from rest_framework.views import APIView
+from rest_framework import viewsets
+from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from .serializers import WomenSerializer
-from .models import Women
+from .models import Category, Women
 
 
 class WomenViewSet(viewsets.ModelViewSet):
-    queryset = Women.objects.all()
+    # queryset = Women.objects.all()
     serializer_class = WomenSerializer
 
+    def get_queryset(self):
+        pk = self.kwargs.get('pk')
 
-# class WomenAPIList(generics.ListCreateAPIView):
-#     queryset = Women.objects.all()
-#     serializer_class = WomenSerializer
+        if not pk:
+            return Women.objects.all()[:3]
 
+        return Women.objects.filter(pk=pk)
 
-# class WomenAPIUpdate(generics.UpdateAPIView):
-#     queryset = Women.objects.all()
-#     serializer_class = WomenSerializer
+    @action(methods=['get'], detail=True)
+    def category(self, request, pk=None):
+        """Добавление нестандартного маршрута"""
 
-
-# class WomenAPIDetailView(generics.RetrieveUpdateDestroyAPIView):
-#     queryset = Women.objects.all()
-#     serializer_class = WomenSerializer
+        cats = Category.objects.get(pk=pk)
+        return Response({'cats': cats.name})
